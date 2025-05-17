@@ -1,43 +1,36 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import styles from "./Home.module.css"
 import { getAllUsers } from "../../lib/api";
 import { Table } from "../../components/Table/Table";
-import { redirect, useNavigate } from "react-router";
-
-// const users = [
-//   {
-//     _id: 1,
-//     photo: 'https://randomuser.me/api/portraits/thumb/men/1.jpg',
-//     fullName: 'John Doe',
-//     phone: '+1 (555) 123-4567',
-//     status: 'Active',
-//   },
-//   {
-//     _id: 2,
-//     photo: 'https://randomuser.me/api/portraits/thumb/women/2.jpg',
-//     fullName: 'Jane Smith',
-//     phone: '+1 (555) 987-6543',
-//     status: 'Inactive',
-//   },
-// ];
+import { useNavigate } from "react-router";
+import UserContext from "../../context/UserContext";
 
 export const Home = () => {
+  const [isAdmin, setIsAdmin] = useState(false)
   const [users, setUsers] = useState([])
   const navigate = useNavigate()
+  // const userContext = useContext(UserContext)
+
 
   useEffect(() => {
     const token = localStorage.getItem("token")
     if (!token) {
       navigate("/login")
     } else {
-      getAllUsers()
-        .then(res => {
-          if (res.status == "ok") {
-            setUsers(res.payload)
-          }
-        })
+      getAllUsers().then(res => {
+        if (res.status == "ok") {
+          setUsers(res.payload)
+        }
+      })
     }
   }, [])
+
+
+  const handleLogout = () => {
+    localStorage.removeItem("token")
+    navigate("/login")
+  }
+
 
   return (
     <div className={styles.wrapper}>
@@ -49,7 +42,7 @@ export const Home = () => {
               <button className={styles.action}>Edit</button>
             </div>
             <div className={styles.logout}>
-              <button className={styles.action}>Logout</button>
+              <button className={styles.action} onClick={handleLogout}>Logout</button>
             </div>
           </div>
         </div>

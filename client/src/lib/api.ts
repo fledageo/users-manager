@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { ILoginData, IResponse } from "./types";
+import type { ILoginData, IResponse, IUser } from "./types";
 
 const api = axios.create({
     baseURL: "http://localhost:5000/api"
@@ -7,7 +7,7 @@ const api = axios.create({
 
 api.interceptors.request.use(function (config) {
     const token = localStorage.getItem("token")
-    if(token){
+    if (token) {
         config.headers.Authorization = `Bearer ${token}`
     }
     return config;
@@ -27,3 +27,17 @@ export const getAllUsers = async (): Promise<IResponse> => {
     return response.data
 }
 
+export const inviteUser = async (email: string): Promise<IResponse> => {
+    const response = await api.post("user/invite", { email })
+    return response.data
+}
+
+export const verifyInvitationToken = async (token:string): Promise<IResponse> => {
+    const response = await api.post("user/invite/verify", { token })
+    return response.data
+}
+
+export const activateUser = async (user:IUser, _id:string | number): Promise<IResponse> => {
+    const response = await api.post("user/activate", { user, _id })
+    return response.data
+}

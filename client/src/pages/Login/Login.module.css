@@ -1,0 +1,34 @@
+.wrapper{
+    display: flex;
+    justify-content: center;
+}
+.container{
+    margin-top: 100px;
+    background-color: #e9edc9;
+    padding: 50px;
+    border-radius: 15px;
+}
+.title{
+    text-align: center;
+}
+.form{
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.field{
+    height: 25px;
+    padding: 5px 0;
+}
+.btn{
+    padding: 5px 20px;
+    background: #faedcd;
+    border-radius: 10px;
+    border: 2px #d4a37391 solid;
+    transition: 0.2s;
+    color: #314764;
+}
+.btn:hover{
+    background-color: #ffdd87;
+}

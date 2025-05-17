@@ -20,3 +20,10 @@ th {
 td,th {
     padding: 8px;
 }
+
+.status_invited{
+    color: orange;
+}
+.status_active {
+    color: green;
+}

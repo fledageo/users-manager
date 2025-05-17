@@ -9,12 +9,12 @@
     flex-direction: column;
     gap: 20px;
     margin-top: 40px;
-    border: 1px solid  rgb(196, 196, 196);
+    border: 1px solid  #e9edc9;
 }
 .header{
     height: 50px;
     width: 100%;
-    background-color: rgb(196, 196, 196);
+    background-color: #e9edc9;
     padding: 10px;
 }
 .header_container{
@@ -34,13 +34,13 @@
 }
 .action {
     padding: 5px 20px;
-    background: none;
+    background: #faedcd;
     border-radius: 10px;
-    border: 2px #758D93 solid;
+    border: 2px #d4a37391 solid;
     transition: 0.2s;
     color: #314764;
 }
 
 .action:hover{
-    background-color: #678e978f;
+    background-color: #ffdd87;
 }

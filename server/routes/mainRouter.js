@@ -7,4 +7,5 @@ const router = e.Router()
 router.use("/auth",authRouter)
 router.use("/user", userRouter)
 
+
 module.exports = router

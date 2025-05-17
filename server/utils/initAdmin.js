@@ -5,8 +5,8 @@ module.exports = async function(roleAdmin){
     const isAdminExist = await User.findOne({role: roleAdmin})
     if(!isAdminExist && roleAdmin){
         const admin = {
-            email:"admin",
-            password: await bcrypt.hash("admin",8),
+            email: process.env.ADMIN_LOGIN,
+            password: await bcrypt.hash(process.env.ADMIN_PASSWORD,8),
             role: roleAdmin
         }
         
