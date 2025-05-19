@@ -1,7 +1,7 @@
 import { useNavigate, useSearchParams } from "react-router"
 import styles from "./Activate.module.css"
 import { useEffect, useState } from "react"
-import { activateUser, verifyInvitationToken } from "../../lib/api"
+import { activateUser, verifyToken } from "../../lib/api"
 import { useForm, type FieldValues } from "react-hook-form"
 
 export const Activate = () => {
@@ -17,7 +17,7 @@ export const Activate = () => {
 
 
     useEffect(() => {
-        verifyInvitationToken(token)
+        verifyToken(token)
             .then(res => {
                 if (res.status == "ok") {
                     setUserId(res.payload)
@@ -34,7 +34,6 @@ export const Activate = () => {
                 phone: data.phone,
                 password: data.password
             }
-            console.log(userId)
             activateUser(user, userId)
             .then(res => {
                 if(res.status == "ok"){

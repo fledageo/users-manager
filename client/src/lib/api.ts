@@ -23,8 +23,12 @@ export const login = async (user: ILoginData): Promise<IResponse> => {
 }
 
 export const getAllUsers = async (): Promise<IResponse> => {
-    const response = await api.get("user/all")
-    return response.data
+    try {
+        const response = await api.get("user/all")
+        return response.data
+    } catch (error: any) {
+        return error.response.data
+    }
 }
 
 export const inviteUser = async (email: string): Promise<IResponse> => {
@@ -32,9 +36,13 @@ export const inviteUser = async (email: string): Promise<IResponse> => {
     return response.data
 }
 
-export const verifyInvitationToken = async (token: string): Promise<IResponse> => {
-    const response = await api.post("user/invite/verify", { token })
-    return response.data
+export const verifyToken = async (token: string): Promise<IResponse> => {
+    try {
+        const response = await api.post("auth/token/verify", { token })
+        return response.data
+    } catch (error: any) {
+        return error.response.data
+    }
 }
 
 export const activateUser = async (user: IUser, _id: string | number): Promise<IResponse> => {
@@ -45,4 +53,28 @@ export const activateUser = async (user: IUser, _id: string | number): Promise<I
 export const sendResetMail = async (email: string): Promise<IResponse> => {
     const response = await api.post("user/reset/password", { email })
     return response.data
+}
+
+export const changePassword = async (newPassword: string, userId: string | number): Promise<IResponse> => {
+    const response = await api.post("user/change/password", { newPassword, userId })
+    return response.data
+}
+
+export const deleteUser = async (userId: string): Promise<IResponse> => {
+    try {
+        const response = await api.delete(`user/delete/${userId}`)
+        return response.data
+    } catch (error: any) {
+        return error.response.data
+    }
 }   
+
+export const updateUser = async (userId:string, data:any): Promise<IResponse> => {
+    try {
+        const response = await api.patch(`user/update/${userId}`, data)
+        return response.data
+    } catch (error: any) {
+        return error.response.data
+    }
+}   
+

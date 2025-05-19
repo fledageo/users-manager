@@ -6,7 +6,14 @@ export interface IUser {
     phone?: string,
     fullName?: string
     photo?: string
+    role?: any
 }
+export interface IRole{
+    name:string,
+    invite?:boolean
+    permissions: any
+}
+
 
 export interface ILoginData {
     email: string

@@ -1,17 +1,15 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./Home.module.css"
 import { getAllUsers } from "../../lib/api";
 import { Table } from "../../components/Table/Table";
 import { useNavigate } from "react-router";
-import UserContext from "../../context/UserContext";
+import type { IUser } from "../../lib/types";
 
 export const Home = () => {
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [users, setUsers] = useState([])
+  const [currentUser, setCurrentUser] = useState<IUser>({})
+  const [users, setUsers] = useState<IUser[]>([])
   const navigate = useNavigate()
-  // const userContext = useContext(UserContext)
-
-
+  
   useEffect(() => {
     const token = localStorage.getItem("token")
     if (!token) {
@@ -19,7 +17,10 @@ export const Home = () => {
     } else {
       getAllUsers().then(res => {
         if (res.status == "ok") {
-          setUsers(res.payload)
+          setUsers(res.payload.allUsers)
+          setCurrentUser(res.payload.currentUser)
+        }else{
+          navigate("/login")
         }
       })
     }
@@ -38,8 +39,9 @@ export const Home = () => {
         <div className={styles.header}>
           <div className={styles.header_container}>
             <div className={styles.actions}>
-              <button className={styles.action} onClick={() => navigate('/invite')}>+ Invite</button>
-              <button className={styles.action}>Edit</button>
+              {
+                currentUser?.role?.invite && <button className={styles.action} onClick={() => navigate('/invite')}>+ Invite</button>
+              }
             </div>
             <div className={styles.logout}>
               <button className={styles.action} onClick={handleLogout}>Logout</button>
@@ -48,7 +50,7 @@ export const Home = () => {
         </div>
 
         <div className={styles.table_wrapper}>
-          <Table users={users} />
+          <Table users={users} current={currentUser} setUsers={setUsers}/>
         </div>
       </div>
     </div>
