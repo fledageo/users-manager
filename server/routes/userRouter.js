@@ -7,5 +7,7 @@ router.get("/all", authToken ,UserController.getAllUsers)
 router.post("/invite", authToken ,UserController.inviteUser)
 router.post("/invite/verify", UserController.verifyInvitationToken)
 router.post("/activate", UserController.userActivate)
+router.post("/reset/password", UserController.sendResetToken)
+
 
 module.exports = router

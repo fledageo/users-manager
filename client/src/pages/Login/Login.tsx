@@ -41,6 +41,8 @@ export const Login = () => {
             {...register("password", { required: true })}
           />
           <button type="submit" className={styles.btn}>Login</button>
+
+          <a href="/reset/password">Forgot Password</a>
         </form>
       </div>
     </div>

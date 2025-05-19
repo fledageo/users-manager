@@ -32,12 +32,17 @@ export const inviteUser = async (email: string): Promise<IResponse> => {
     return response.data
 }
 
-export const verifyInvitationToken = async (token:string): Promise<IResponse> => {
+export const verifyInvitationToken = async (token: string): Promise<IResponse> => {
     const response = await api.post("user/invite/verify", { token })
     return response.data
 }
 
-export const activateUser = async (user:IUser, _id:string | number): Promise<IResponse> => {
+export const activateUser = async (user: IUser, _id: string | number): Promise<IResponse> => {
     const response = await api.post("user/activate", { user, _id })
     return response.data
 }
+
+export const sendResetMail = async (email: string): Promise<IResponse> => {
+    const response = await api.post("user/reset/password", { email })
+    return response.data
+}   

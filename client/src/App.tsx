@@ -6,6 +6,7 @@ import { Activate } from "./pages/Activate/Activate"
 import UserContext from "./context/UserContext"
 import { useState } from "react"
 import type { IUser } from "./lib/types"
+import { ResetPassword } from "./pages/ResetPassword/ResetPassword"
 
 const router = createBrowserRouter([
   {
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
   {
     path: "/activate",
     element: <Activate />
+  },
+  {
+    path: "/reset/password",
+    element: <ResetPassword />
   }
 ])
 

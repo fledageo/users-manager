@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const Role = require("../models/Role");
 const jwt = require("jsonwebtoken")
-const sendInvitation = require("../utils/mailSender")
+const sendMail = require("../utils/mailSender")
 const bcrypt = require("bcrypt")
 
 class UserController {
@@ -23,16 +23,16 @@ class UserController {
 
         try {
             const userRoleId = await Role.findOne({ name: "user" }, "_id")
-            
+
             const newUser = await User.create({
                 email: email,
                 role: userRoleId._id,
                 status: "invited",
             })
-            
+
             const inviteToken = jwt.sign({ _id: newUser._id }, process.env.SECRET_KEY, { expiresIn: "1d" })
 
-            const send = await sendInvitation(email, inviteToken)
+            const send = await sendMail(email, inviteToken, "invite")
             if (send) {
                 res.status(200).json({ status: "ok", message: "Invitation sent" })
             }
@@ -48,7 +48,7 @@ class UserController {
         try {
             const verified = jwt.verify(token, process.env.SECRET_KEY)
             const user = await User.findById(verified._id)
-            
+
 
             res.status(200).json({ status: "ok", payload: verified._id })
 
@@ -77,6 +77,24 @@ class UserController {
             res.status(500).json({ status: "error", message: 'Something went wrong...' })
         }
     }
+
+    async sendResetToken(req, res) {
+        const { email } = req.body
+        try {
+            const exist = User.findOne({ email: email })
+            if (exist) {
+                const token = jwt.sign({ _id: exist._id }, process.env.SECRET_KEY, { expiresIn: "1h" })
+                const send = await sendMail(email, token, "reset")
+                if (send) {
+                    res.status(200).json({ status: "ok", message: "link sent" })
+                }
+            }
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ status: "error", message: "something went wrong..." })
+        }
+    }
+
 }
 
 module.exports = new UserController()
