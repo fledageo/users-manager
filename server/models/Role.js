@@ -1,17 +1,16 @@
 const { Schema, model } = require("mongoose");
 
-const fields = ["fullName","phone","status","email"]
 
 const PermissionsSchema = new Schema({
-    view: [{type:String, enum: null}],  
-    edit: [{type:String, enum: [...fields, '*']}],    
-    delete: {type: Boolean, required: true},   
-    invite: {type: Boolean, required: true}    
+    read: [String],
+    update: [String]   
 }, { _id: false })
 
 const RoleSchema = new Schema({
     name: { type: String, required: true, enum: ["admin", "editor", "user"] },
-    permissions: [PermissionsSchema],
+    invite: {type: Boolean},
+    delete:{type: Boolean},
+    permissions: {type: PermissionsSchema}
 })
 
-module.exports = model("Role", RoleSchema);
+module.exports = model("role", RoleSchema);

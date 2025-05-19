@@ -6,14 +6,16 @@ const bcrypt = require("bcrypt")
 
 class UserController {
     async getAllUsers(req, res) {
+        const { userId, role } = req.user
         try {
             const adminRoleId = await Role.findOne({ name: "admin" }, "_id")
-            const allUsers = await User.find({ role: { $ne: adminRoleId } })
+            const allUsers = await User.find({ role: { $ne: adminRoleId } }).populate("role", "name")
 
             if (allUsers) {
-                res.status(200).json({ status: "ok", payload: allUsers })
+                res.status(200).json({ status: "ok", payload: { allUsers, currentUser: { _id: userId, role } } })
             }
         } catch (error) {
+            console.log(error)
             res.status(500).json({ status: "error", message: "Something went wrong..." })
         }
     }
@@ -42,27 +44,12 @@ class UserController {
         }
     }
 
-    async verifyInvitationToken(req, res) {
-        const token = req.body.token
-
-        try {
-            const verified = jwt.verify(token, process.env.SECRET_KEY)
-            const user = await User.findById(verified._id)
-
-
-            res.status(200).json({ status: "ok", payload: verified._id })
-
-        } catch (error) {
-            cosnole.log(error)
-            res.status(400).json({ status: "error", message: 'Invalid or expired activation token' })
-        }
-    }
 
 
     async userActivate(req, res) {
         const { user, _id } = req.body
         const passHash = await bcrypt.hash(user.password, 8)
-        console.log(_id, "--id") //----------------------------------
+
         try {
             const updated = await User.findByIdAndUpdate(_id, {
                 fullName: user.fullName,
@@ -70,7 +57,6 @@ class UserController {
                 password: passHash,
                 status: "active",
             })
-            console.log(updated, "updated")
             res.status(200).json({ status: "ok" })
         } catch (error) {
             console.log(error)
@@ -81,7 +67,7 @@ class UserController {
     async sendResetToken(req, res) {
         const { email } = req.body
         try {
-            const exist = User.findOne({ email: email })
+            const exist = await User.findOne({ email: email })
             if (exist) {
                 const token = jwt.sign({ _id: exist._id }, process.env.SECRET_KEY, { expiresIn: "1h" })
                 const send = await sendMail(email, token, "reset")
@@ -92,6 +78,52 @@ class UserController {
         } catch (error) {
             console.log(error)
             res.status(500).json({ status: "error", message: "something went wrong..." })
+        }
+    }
+
+
+    async changePassword(req, res) {
+        const { newPassword, userId } = req.body
+        const passHash = await bcrypt.hash(newPassword, 8)
+        try {
+            const updated = await User.findByIdAndUpdate(userId, {
+                password: passHash
+            })
+            if (updated) {
+                res.status(200).json({ status: "ok", message: "Password has been changed" })
+            }
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ status: "error", message: "something went wrong..." })
+        }
+    }
+
+    async deleteUser(req, res) {
+        const id = req.params.id
+        try {
+            const deleted = await User.findByIdAndDelete(id)
+            res.status(200).json({ status: "ok", message: "User has been deleted", payload: deleted })
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ status: "error", message: "something went wrong..." })
+        }
+    }
+
+    async updateUser(req, res) {
+        const id = req.params.id
+        const data = req.body
+        try {
+            if (data.role) {
+                const roleId = await Role.findOne({ name: data.role }, "_id")
+                data.role = roleId
+            }
+            const updated = await User.findByIdAndUpdate(id, { $set: data }, { new: true }).populate("role", "name");
+            res.status(200).json({ status: "ok", message: "User has been updated", payload:updated})
+
+        } catch (error) {
+            console.log(error)
+            res.status(500).json({ status: "error", message: "something went wrong..." })
+
         }
     }
 
