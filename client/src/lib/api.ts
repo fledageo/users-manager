@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { Axios, AxiosError } from "axios";
 import type { ILoginData, IResponse, IUser } from "./types";
 
 const api = axios.create({
@@ -17,64 +17,47 @@ api.interceptors.request.use(function (config) {
 });
 
 
-export const login = async (user: ILoginData): Promise<IResponse> => {
-    const response = await api.post("auth/login", user)
-    return response.data
-}
-
-export const getAllUsers = async (): Promise<IResponse> => {
+const handleRequest = async <T>(request:Promise<any>):Promise<T> => {
     try {
-        const response = await api.get("user/all")
+        const response = await request
         return response.data
-    } catch (error: any) {
-        return error.response.data
+    } catch (error:any) {
+        return error?.response?.data || { success: false, message: "Unexpected error" }
     }
 }
 
-export const inviteUser = async (email: string): Promise<IResponse> => {
-    const response = await api.post("user/invite", { email })
-    return response.data
+export const login = (user: ILoginData): Promise<IResponse> => {
+    return handleRequest(api.post("auth/login", user))
 }
 
-export const verifyToken = async (token: string): Promise<IResponse> => {
-    try {
-        const response = await api.post("auth/token/verify", { token })
-        return response.data
-    } catch (error: any) {
-        return error.response.data
-    }
+export const getAllUsers = (): Promise<IResponse> => {
+    return  handleRequest(api.get("user/all"))
+}
+export const inviteUser = (email: string): Promise<IResponse> => {
+    return handleRequest(api.post("user/invite", { email }))
 }
 
-export const activateUser = async (user: IUser, _id: string | number): Promise<IResponse> => {
-    const response = await api.post("user/activate", { user, _id })
-    return response.data
+export const verifyToken = (token: string): Promise<IResponse> => {
+    return handleRequest(api.post("auth/token/verify", { token }))
 }
 
-export const sendResetMail = async (email: string): Promise<IResponse> => {
-    const response = await api.post("user/reset/password", { email })
-    return response.data
+export const activateUser = (user: IUser, _id: string | number): Promise<IResponse> => {
+    return handleRequest(api.post("user/activate", { user, _id }))
 }
 
-export const changePassword = async (newPassword: string, userId: string | number): Promise<IResponse> => {
-    const response = await api.post("user/change/password", { newPassword, userId })
-    return response.data
+export const sendResetMail = (email: string): Promise<IResponse> => {
+    return handleRequest(api.post("user/reset/password", { email }))
 }
 
-export const deleteUser = async (userId: string): Promise<IResponse> => {
-    try {
-        const response = await api.delete(`user/delete/${userId}`)
-        return response.data
-    } catch (error: any) {
-        return error.response.data
-    }
-}   
+export const changePassword = (newPassword: string, userId: string | number): Promise<IResponse> => {
+    return handleRequest(api.post("user/change/password", { newPassword, userId }))
+}
 
-export const updateUser = async (userId:string, data:any): Promise<IResponse> => {
-    try {
-        const response = await api.patch(`user/update/${userId}`, data)
-        return response.data
-    } catch (error: any) {
-        return error.response.data
-    }
-}   
+export const deleteUser = (userId: string): Promise<IResponse> => {
+    return handleRequest(api.delete(`user/delete/${userId}`))
+}
+
+export const updateUser = (userId: string, data: any): Promise<IResponse> => {
+    return handleRequest(api.patch(`user/update/${userId}`, data))
+}
 
