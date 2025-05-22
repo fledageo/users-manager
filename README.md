@@ -1,53 +1,39 @@
-# 🛡️ RBAC Web App
+# User Management System
 
-A secure, role-based access control application built with a focus on backend-driven logic (Single Source of Truth). Designed to manage users, enforce permissions, and provide secure authentication and user onboarding.
+A user management system with **role-based access control (RBAC)** built using **Node.js**, **Express**, **MongoDB**, and **React**.
 
----
+## Features
 
-## 👥 Roles & Permissions
+- **Admin auto-creation on startup**
+  - **Login**: `admin`
+  - **Password**: `admin`
 
-This app uses **Role-Based Access Control (RBAC)** with three distinct roles:
+-  **Three roles with specific permissions**:
+  - **Admin**:
+    - Can edit all fields
+    - Can invite users via email
+    - Can delete users
+    - Can assign roles
+  - **Editor**:
+    - Can edit specific fields of all users
+  - **User**:
+    - Can edit only their own information
 
-- **Admin**
-  - Full access to all features.
-  - Can invite and delete users.
-  - Can remove all data fields.
+-  **Invite users via email** using **Nodemailer**
+-  **JWT authentication**
+- **Password reset (Forgot password)** via email
+  - **Middleware-based permission checks** for:
+  - Role actions (invite, delete, update)
+  - Field-level updates
+  - Token validation and user role recognition
 
-- **Editor**
-  - Can edit specific fields.
-  - Cannot invite or delete users.
+##  Tech Stack
 
-- **User**
-  - Read-only access.
-  - Can view data but cannot make changes.
-
-> All permission checks are handled on the **server side** using middleware, ensuring security even if frontend is bypassed.
-
----
-
-## 🔐 Authentication
-
-- Authentication is handled using **JWT (JSON Web Tokens)**.
-- After login, tokens are stored and automatically included in requests using **Axios interceptors**.
-- Each request is verified on the backend to ensure the user has a valid token and appropriate permissions.
-
----
-
-## ✉️ User Invitation & Activation
-
-- Only admins can send invitations.
-- Invites are sent via email using **Nodemailer**.
-- The email contains a secure activation token.
-- After clicking the link and completing setup, the user’s status changes from `invited` to `active`.
-
----
-
-## 🔁 Forgot Password
-
-- Users can reset their password through a secure **"Forgot Password"** flow.
-- Reset links are sent via email, allowing users to create a new password safely.
+- **Backend**: Node.js, Express.js, MongoDB, Mongoose
+- **Frontend**: React.js (with TypeScript)
 
 
+##  Setup Instructions
 
 1. Clone the project.
 2. Navigate into both the `server` and `client` directories.
