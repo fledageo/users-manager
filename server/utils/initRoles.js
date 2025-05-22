@@ -10,21 +10,25 @@ const roles = [
 
         permissions: {
             read: ["email", "fullName", "phone", "status", "role"],
-            update: ["email", "fullName", "phone", "role"]
-        }
+            update: ["photo","email", "fullName", "phone", "role"]
+        },
+        scope: "any"
     },
     {
         name: "editor",
         permissions: {
             read: ["email", "fullName", "phone", "status"],
             update: ["fullName", "phone"]
-        }
+        },
+        scope: "any"
     },
     {
         name: "user",
         permissions: {
-            read: ["email", "fullName", "phone"]
-        }
+            read: ["email", "fullName", "phone"],
+            update: ["photo","fullName", "phone"]
+        },
+        scope: "own"
     }
 ]
 

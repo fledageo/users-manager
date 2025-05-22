@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Role = require("../models/Role");
+const Photo = require("../models/Photo");
 const jwt = require("jsonwebtoken")
 const sendMail = require("../utils/mailSender")
 const bcrypt = require("bcrypt")
@@ -11,8 +12,15 @@ class UserController {
             const adminRoleId = await Role.findOne({ name: "admin" }, "_id")
             const allUsers = await User.find({ role: { $ne: adminRoleId } }).populate("role", "name")
 
+            const sortedUsers = allUsers.sort((a, b) => {
+                if (a._id == userId) return -1
+                if (b._id == userId) return 1
+                return 0
+            })
+
+
             if (allUsers) {
-                res.status(200).json({ status: "ok", payload: { allUsers, currentUser: { _id: userId, role } } })
+                res.status(200).json({ status: "ok", payload: { allUsers: sortedUsers, currentUser: { _id: userId, role } } })
             }
         } catch (error) {
             console.log(error)
@@ -47,16 +55,26 @@ class UserController {
 
 
     async userActivate(req, res) {
-        const { user, _id } = req.body
-        const passHash = await bcrypt.hash(user.password, 8)
+        const { fullName, phone, password, _id } = req.body
+        const passHash = await bcrypt.hash(password, 8)
 
         try {
-            const updated = await User.findByIdAndUpdate(_id, {
-                fullName: user.fullName,
-                phone: user.phone,
+            const updateData = {
+                fullName: fullName,
+                phone: phone,
                 password: passHash,
                 status: "active",
-            })
+            }
+
+            if (req.file) {
+                const photo = await Photo.create({
+                    data: req.file.buffer,
+                    contentType: req.file.mimetype
+                })
+                updateData.photo = photo._id
+            }
+
+            const updated = await User.findByIdAndUpdate(_id, updateData)
             res.status(200).json({ status: "ok" })
         } catch (error) {
             console.log(error)
@@ -112,21 +130,43 @@ class UserController {
     async updateUser(req, res) {
         const id = req.params.id
         const data = req.body
+        const updateData = { ...data }
         try {
             if (data.role) {
                 const roleId = await Role.findOne({ name: data.role }, "_id")
-                data.role = roleId
+                updateData.role = roleId._id
             }
-            const updated = await User.findByIdAndUpdate(id, { $set: data }, { new: true }).populate("role", "name");
-            res.status(200).json({ status: "ok", message: "User has been updated", payload:updated})
+            if (req.file) {
+                const photo = await Photo.create({
+                    data: req.file.buffer,
+                    contentType: req.file.mimetype
+                })
+                updateData.photo = photo._id
+            }
+            const updated = await User.findByIdAndUpdate(id, { $set: updateData }, { new: true }).populate("role", "name");
+            res.status(200).json({ status: "ok", message: "User has been updated", payload: updated })
 
         } catch (error) {
             console.log(error)
             res.status(500).json({ status: "error", message: "something went wrong..." })
-
         }
     }
 
+
+    async getAvatarPhoto(req, res) {
+        try {
+            const photo = await Photo.findById(req.params.id)
+            if (!photo) {
+                return res.status(404).send("No image")
+            }
+
+            res.set("Content-Type", photo.contentType)
+            res.send(photo.data);
+        } catch (error) {
+            console.log(error);
+            res.status(500).send("Error loading image");
+        }
+    }
 }
 
 module.exports = new UserController()

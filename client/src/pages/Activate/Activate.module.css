@@ -37,3 +37,7 @@
 .btn:hover {
     background-color: #ffdd87;
 }
+
+.fileField{
+    height: fit-content;
+}

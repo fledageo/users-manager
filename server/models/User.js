@@ -6,7 +6,8 @@ const User = new Schema({
     role:{type: Schema.Types.ObjectId, ref:"role"},
     fullName:{type:String},
     phone:{type:String},
-    status:{type:String, num:["invited", "active"]}
+    status:{type:String, num:["invited", "active"]},
+    photo:{type: Schema.Types.ObjectId, ref:"photo"}
 })
 
 module.exports = model("user",User)

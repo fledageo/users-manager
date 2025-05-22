@@ -5,14 +5,14 @@ import { activateUser, verifyToken } from "../../lib/api"
 import { useForm, type FieldValues } from "react-hook-form"
 
 export const Activate = () => {
-    const [userId, setUserId] = useState<string | number>("")
+    const [userId, setUserId] = useState<string>("")
     const [tokenExpired, setTokenExpired] = useState<boolean>(false)
-    
+
     const { register, handleSubmit } = useForm()
     const navigate = useNavigate()
-    
+
     const [searchParams] = useSearchParams()
-    
+
     const token = searchParams.get("token") as string
 
 
@@ -21,25 +21,30 @@ export const Activate = () => {
             .then(res => {
                 if (res.status == "ok") {
                     setUserId(res.payload)
-                }else{
+                } else {
                     setTokenExpired(true)
-                }   
+                }
             })
     }, [])
 
     const handleActivate = (data: FieldValues) => {
-        if(data.password === data.confirmPassword){
-            const user = {
-                fullName: `${data.name} ${data.surname}`,
-                phone: data.phone,
-                password: data.password
+        if (data.password === data.confirmPassword) {
+            const formData = new FormData()
+
+            formData.append("fullName", `${data.name} ${data.surname}`)
+            formData.append("phone", data.phone)
+            formData.append("password", data.password)
+            formData.append("_id", userId)
+
+            if (data.photo && data.photo[0]) {
+                formData.append("photo", data.photo[0]);
             }
-            activateUser(user, userId)
-            .then(res => {
-                if(res.status == "ok"){
-                    navigate("/login")
-                }
-            })
+            activateUser(formData, userId)
+                .then(res => {
+                    if (res.status == "ok") {
+                        navigate("/login")
+                    }
+                })
         }
     }
 
@@ -85,6 +90,16 @@ export const Activate = () => {
                                     className={styles.field}
                                     {...register("confirmPassword", { required: true })}
                                 />
+                                <div className={styles.uploadWrapper}>
+                                    <label htmlFor="fileUpload">Choose Photo</label>
+                                    <input
+                                        type="file"
+                                        id="fileUpload"
+                                        className={`${styles.field} ${styles.fileField}`}
+                                        {...register("photo")}
+                                    />
+                                </div>
+
                                 <button type="submit" className={styles.btn}>Activate</button>
                             </form>
                         </div>

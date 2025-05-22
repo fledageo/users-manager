@@ -20,7 +20,6 @@ export const Table = ({ users, current, setUsers }: IProps) => {
     const toggleMenu = (userId: string) => {
         setOpenMenu(prev => prev === userId ? null : userId)
     }
-
     const handleDeleteUser = (id: string) => {
         deleteUser(id)
             .then(res => {
@@ -28,8 +27,6 @@ export const Table = ({ users, current, setUsers }: IProps) => {
                     setUsers(prev => {
                         return prev.filter(user => user._id !== res.payload._id)
                     })
-                } else {
-                    alert("You don't have permission to delete")
                 }
                 setOpenMenu(null)
             })
@@ -48,7 +45,7 @@ export const Table = ({ users, current, setUsers }: IProps) => {
                 <table className={styles.table}>
                     <thead>
                         <tr>
-                            <th>picture</th>
+                            <th></th>
                             {
                                 readable.map((field: String) => <th key={field as string}>{field}</th>)
                             }
@@ -56,10 +53,11 @@ export const Table = ({ users, current, setUsers }: IProps) => {
                     </thead>
                     <tbody>
                         {users.map((user) => (
-                            <tr key={user._id} >
+                            <tr key={user._id} className={styles.row}>
                                 <td>
+                                    {user._id === current._id && <span className={styles.mark}>You</span>}
                                     <img
-                                        src={user.photo || avatar}
+                                        src={`http://localhost:5000/api/user/photo/${user.photo}`}
                                         alt={user.fullName}
                                         className={styles.avatar}
                                     />
@@ -74,22 +72,30 @@ export const Table = ({ users, current, setUsers }: IProps) => {
                                         </td>
                                     ))
                                 }
-                                <td>
-                                    <div className={styles.menuContainer}>
-                                        <button
-                                            className={styles.dotButton}
-                                            onClick={() => toggleMenu(user._id as string)}
-                                        >
-                                            ⋮
-                                        </button>
-                                        {openMenu === user._id && (
-                                            <div className={styles.dropdownMenu}>
-                                                <button onClick={() => setOpenModal(user)}>Edit</button>
-                                                <button onClick={() => handleDeleteUser(user._id as string)}>Delete</button>
-                                            </div>
-                                        )}
-                                    </div>
-                                </td>
+                                {
+                                    (current.role.scope == "any" || user._id == current._id) &&
+                                    < td >
+                                        <div className={styles.menuContainer}>
+                                            <button
+                                                className={styles.dotButton}
+                                                onClick={() => toggleMenu(user._id as string)}
+                                            >
+                                                ⋮
+                                            </button>
+                                            {openMenu === user._id && (
+                                                <div className={styles.dropdownMenu}>
+                                                    <button onClick={() => setOpenModal(user)}>Edit</button>
+                                                    {
+                                                        current.role.delete &&
+                                                        <button onClick={() => handleDeleteUser(user._id as string)}>
+                                                            Delete
+                                                        </button>
+                                                    }
+                                                </div>
+                                            )}
+                                        </div>
+                                    </td>
+                                }
 
                             </tr>
                         ))}
@@ -106,7 +112,7 @@ export const Table = ({ users, current, setUsers }: IProps) => {
                 }
 
 
-            </div>
+            </div >
         </>
     )
 }

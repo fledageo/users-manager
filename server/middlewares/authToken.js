@@ -7,12 +7,13 @@ module.exports = async (req, res, next) => {
     if (!token) {
         return res.status(400).json({ status: "error", message: 'Token missing' })
     }
-
+    
     try {
         const verified = jwt.verify(token, process.env.SECRET_KEY)
         const exist = await User.findById(verified.userId)
         if (exist) {
             req.user = verified
+            console.log(req.user)
             next()
         }else{
             res.status(400).json({ status: "error", message: 'No User' })

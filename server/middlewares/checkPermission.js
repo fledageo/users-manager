@@ -1,7 +1,8 @@
-module.exports = function (action, field = null) {
+module.exports = function (action) {
     return async (req, res, next) => {
         try {
             const role = req.user.role;
+            const currentUser = req.user
 
             if (action === "update") {
                 const data = req.body
@@ -13,6 +14,10 @@ module.exports = function (action, field = null) {
                 if (notAllowedFields.length > 0) {
                     return res.status(400).json({ status: "error", message: `You don't have permission to update: ${notAllowedFields.join(", ")}` });
                 }
+                if(role.scope === "own" && req.params.id !== currentUser.userId){
+                    return res.status(400).json({ status: "error", message: `You can only update your own profile` });
+                }
+
             }
 
             if (action === "invite" && !role.invite) {

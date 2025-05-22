@@ -26,6 +26,7 @@ const handleRequest = async <T>(request:Promise<any>):Promise<T> => {
     }
 }
 
+
 export const login = (user: ILoginData): Promise<IResponse> => {
     return handleRequest(api.post("auth/login", user))
 }
@@ -41,8 +42,12 @@ export const verifyToken = (token: string): Promise<IResponse> => {
     return handleRequest(api.post("auth/token/verify", { token }))
 }
 
-export const activateUser = (user: IUser, _id: string | number): Promise<IResponse> => {
-    return handleRequest(api.post("user/activate", { user, _id }))
+export const activateUser = (user: FormData, _id: string | number): Promise<IResponse> => {
+    return handleRequest(api.post("user/activate", user, {
+        headers: {
+            "Content-Type": "multipart/form-data"
+        }
+    }))
 }
 
 export const sendResetMail = (email: string): Promise<IResponse> => {
@@ -58,6 +63,10 @@ export const deleteUser = (userId: string): Promise<IResponse> => {
 }
 
 export const updateUser = (userId: string, data: any): Promise<IResponse> => {
-    return handleRequest(api.patch(`user/update/${userId}`, data))
+    return handleRequest(api.patch(`user/update/${userId}`, data, {
+        headers: {
+            "Content-Type": "multipart/form-data"
+        }
+    }))
 }
 
