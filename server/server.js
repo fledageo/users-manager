@@ -4,7 +4,6 @@ const cors = require("cors")
 const mongoose = require("mongoose")
 
 const router = require("./routes/mainRouter.js")
-const initAdmin = require('./utils/initAdmin')
 const initRoles = require('./utils/initRoles.js')
 
 const app = express()

@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const User = require("../models/User");
 const Role = require("../models/Role");
 const Photo = require("../models/Photo");
@@ -32,8 +34,12 @@ class UserController {
         const { email } = req.body
 
         try {
-            const userRoleId = await Role.findOne({ name: "user" }, "_id")
+            const exist = await User.findOne({email: email}) 
+            if(exist){
+                return res.status(400).json({ status: "error", message: "User with this email already exist" })
+            }
 
+            const userRoleId = await Role.findOne({ name: "user" }, "_id")
             const newUser = await User.create({
                 email: email,
                 role: userRoleId._id,
@@ -155,13 +161,19 @@ class UserController {
 
     async getAvatarPhoto(req, res) {
         try {
-            const photo = await Photo.findById(req.params.id)
-            if (!photo) {
-                return res.status(404).send("No image")
+            if (req.params.id !== "undefined") {
+                const photo = await Photo.findById(req.params.id)
+                res.set("Content-Type", photo.contentType)
+                res.send(photo.data);
+            } else {
+                const defaultPath = path.join(__dirname, '../assets/avatar.png')
+                const defaultAvatar = fs.readFileSync(defaultPath)
+
+                res.set('Content-Type', 'image/png');
+                return res.send(defaultAvatar);
             }
 
-            res.set("Content-Type", photo.contentType)
-            res.send(photo.data);
+            
         } catch (error) {
             console.log(error);
             res.status(500).send("Error loading image");

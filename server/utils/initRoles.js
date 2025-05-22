@@ -1,5 +1,6 @@
+const bcrypt = require("bcrypt")
+const User = require("../models/User")
 const Role = require("../models/Role")
-const initAdmin = require("./initAdmin")
 
 const roles = [
     {
@@ -10,7 +11,7 @@ const roles = [
 
         permissions: {
             read: ["email", "fullName", "phone", "status", "role"],
-            update: ["photo","email", "fullName", "phone", "role"]
+            update: ["photo", "email", "fullName", "phone", "role"]
         },
         scope: "any"
     },
@@ -26,11 +27,25 @@ const roles = [
         name: "user",
         permissions: {
             read: ["email", "fullName", "phone"],
-            update: ["photo","fullName", "phone"]
+            update: ["photo", "fullName", "phone"]
         },
         scope: "own"
     }
 ]
+
+const initAdmin = async (roleAdmin) => {
+    const isAdminExist = await User.findOne({ role: roleAdmin })
+    if (!isAdminExist && roleAdmin) {
+        const admin = {
+            email: process.env.ADMIN_LOGIN,
+            password: await bcrypt.hash(process.env.ADMIN_PASSWORD, 8),
+            role: roleAdmin
+        }
+
+        const createAdmin = await User.create(admin)
+        return createAdmin
+    }
+}
 
 
 module.exports = async function () {

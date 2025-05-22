@@ -1,6 +1,5 @@
 import type { IUser } from "../../lib/types"
 import styles from "./Table.module.css"
-import avatar from "../../assets/avatar.png"
 import { useState, type Dispatch, type SetStateAction } from "react"
 import { deleteUser } from "../../lib/api"
 import { EditModal } from "../EditModal/EditModal"
@@ -58,6 +57,7 @@ export const Table = ({ users, current, setUsers }: IProps) => {
                                     {user._id === current._id && <span className={styles.mark}>You</span>}
                                     <img
                                         src={`http://localhost:5000/api/user/photo/${user.photo}`}
+
                                         alt={user.fullName}
                                         className={styles.avatar}
                                     />
